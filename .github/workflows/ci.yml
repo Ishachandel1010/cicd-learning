@@ -20,8 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: Install dependencies
@@ -30,3 +29,20 @@ jobs:
       - name: Run Node tests
         working-directory: ./node-app
         run: node --test
+
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        working-directory: ./node-app
+        run: docker build -t cicd-learning-node .
+      - name: Run container and check output
+        working-directory: ./node-app
+        run: |
+          output=$(docker run cicd-learning-node)
+          echo "$output"
+          if [ "$output" != "Hello from the Node CI/CD app!" ]; then
+            echo "Container output mismatch"
+            exit 1
+          fi
